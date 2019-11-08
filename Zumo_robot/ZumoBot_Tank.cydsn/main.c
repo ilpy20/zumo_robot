@@ -442,31 +442,54 @@ void zmain(void)
         printf("Device Ok...\n");
     }
     motor_start();              // enable motor controller
+    motor_forward(0,0);
+    srand(time(NULL));   // Initialization, should only be called once.
+    int r=0, counter=0;
     while(true)
     {
         LSM303D_Read_Acc(&data);
        
-        motor_forward(200,2000);
-        
-        /*if(((data.accX>=1000)&&(data.accY>=500))||((data.accX<=-1)&&(data.accY<=-1))){
-            srand(time(NULL));   // Initialization, should only be called once.
-            int r = rand() % 1;      // Returns a pseudo-random integer between 0 and RAND_MAX.
+        motor_forward(200,20);
+        //vTaskDelay(200);
+        if (counter == 0) r = rand() % 2;
+        if (counter > 19){
+            counter = 0;
+            r = rand() % 2;
+        }// Returns a pseudo-random integer between 0 and RAND_MAX.
             if(r == 0){
-                motor_backward(80,1000);
-                motor_turn(200,50,2000);
+                motor_turn(200,50,5);
+                vTaskDelay(0);
+                //motor_forward(0,0);
+            }
+            else if(r == 1){
+                motor_turn(50,200,5);
+                vTaskDelay(0);
+                //motor_forward(0,0);
+            }
+            else {
+                motor_forward(200,20);
+                vTaskDelay(0);
+            }
+        LSM303D_Read_Acc(&data);
+        if((data.accX<-4000)){
+            int r = rand() % 2;      // Returns a pseudo-random integer between 0 and RAND_MAX.
+            if(r == 0){
+                motor_backward(80,50);
+                motor_turn(200,50,500);
+                vTaskDelay(0);
+                //motor_forward(0,0);
             }
             else{
-                motor_backward(80,1000);
-                motor_turn(50,200,2000);
+                motor_backward(80,50);
+                motor_turn(50,200,500);
+                vTaskDelay(0);
+                //motor_forward(0,0);
             }
+            motor_forward(100,100);
         }
-        else{
-            motor_forward(200,2000);
-        }
-        */
-        
+        counter++;
         printf("%8d %8d %8d\n",data.accX, data.accY, data.accZ);
-        vTaskDelay(50);
+        vTaskDelay(0);
     }
  }   
 #endif    

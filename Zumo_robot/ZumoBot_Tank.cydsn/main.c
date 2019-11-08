@@ -31,6 +31,7 @@
 
 #include <project.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "FreeRTOS.h"
 #include "task.h"
 #include "Motor.h"
@@ -401,7 +402,7 @@ void zmain(void)
 }
 #endif
 
-#if 0
+#if 1
 /* Example of how to use te Accelerometer!!!*/
 void zmain(void)
 {
@@ -416,10 +417,30 @@ void zmain(void)
     else {
         printf("Device Ok...\n");
     }
-    
+    motor_start();              // enable motor controller
     while(true)
     {
         LSM303D_Read_Acc(&data);
+       
+        motor_forward(200,2000);
+        
+        /*if(((data.accX>=1000)&&(data.accY>=500))||((data.accX<=-1)&&(data.accY<=-1))){
+            srand(time(NULL));   // Initialization, should only be called once.
+            int r = rand() % 1;      // Returns a pseudo-random integer between 0 and RAND_MAX.
+            if(r == 0){
+                motor_backward(80,1000);
+                motor_turn(200,50,2000);
+            }
+            else{
+                motor_backward(80,1000);
+                motor_turn(50,200,2000);
+            }
+        }
+        else{
+            motor_forward(200,2000);
+        }
+        */
+        
         printf("%8d %8d %8d\n",data.accX, data.accY, data.accZ);
         vTaskDelay(50);
     }

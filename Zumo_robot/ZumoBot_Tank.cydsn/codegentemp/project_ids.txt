@@ -1,0 +1,6 @@
+C:\Users\ilyap\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\Downloads ( 4.2).cyprj|3961dbbd-c44f-4a82-8f39-80e32998d965
+C:\Program Files (x86)\Cypress\PSoC Creator\4.2\PSoC Creator\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\CyAnnotationLibrary.cyprj|fb903c58-9db2-43a9-a42f-2d0f8e5bdba0
+C:\Program Files (x86)\Cypress\PSoC Creator\4.2\PSoC Creator\psoc\content\cycomponentlibraryupdates\CyComponentLibraryUpdates.cylib\CyComponentLibraryUpdates.cyprj|6d5e7d72-3d49-49ba-b5d7-f392b3fba87a
+C:\Program Files (x86)\Cypress\PSoC Creator\4.2\PSoC Creator\psoc\content\cycomponentlibrary\CyComponentLibrary.cylib\CyComponentLibrary.cyprj|2d648bf1-d6b4-4bfb-a8ea-263d1dacd313
+C:\Program Files (x86)\Cypress\PSoC Creator\4.2\PSoC Creator\psoc\content\cyprimitives\CyPrimitives.cylib\CyPrimitives.cyprj|ad98d1e7-61c3-46e0-87ee-f94baffea5be
+C:\Users\ilyap\Documents\PSoC Creator\Zumo_tank\Zumo_robot\ZumoBot_Tank.cydsn\ZumoBot_Tank.cyprj|269d3d0b-6922-4e82-9ce7-3aa5c4f6e6d4

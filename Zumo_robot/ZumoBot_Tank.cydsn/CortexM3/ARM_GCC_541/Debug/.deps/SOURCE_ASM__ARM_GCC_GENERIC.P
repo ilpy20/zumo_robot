@@ -1,0 +1,10 @@
+C:/Users/ilyap/Documents/PSoC\ Creator/Zumo_tank/Zumo_robot/ZumoBot_Tank.cydsn/CortexM3/ARM_GCC_541/Debug/CyBootAsmGnu.o : C:/Users/ilyap/Documents/PSoC\ Creator/Zumo_tank/Zumo_robot/ZumoBot_Tank.cydsn/Generated_Source/PSoC5/CyBootAsmGnu.s C:/Users/ilyap/Documents/PSoC\ Creator/Zumo_tank/Zumo_robot/ZumoBot_Tank.cydsn/Generated_Source/PSoC5/cydevicegnu.inc C:/Users/ilyap/Documents/PSoC\ Creator/Zumo_tank/Zumo_robot/ZumoBot_Tank.cydsn/Generated_Source/PSoC5/cydevicegnu_trm.inc C:/Users/ilyap/Documents/PSoC\ Creator/Zumo_tank/Zumo_robot/ZumoBot_Tank.cydsn/Generated_Source/PSoC5/cyfittergnu.inc 
+
+C:/Users/ilyap/Documents/PSoC\ Creator/Zumo_tank/Zumo_robot/ZumoBot_Tank.cydsn/Generated_Source/PSoC5/CyBootAsmGnu.s : 
+
+C:/Users/ilyap/Documents/PSoC\ Creator/Zumo_tank/Zumo_robot/ZumoBot_Tank.cydsn/Generated_Source/PSoC5/cydevicegnu.inc : 
+
+C:/Users/ilyap/Documents/PSoC\ Creator/Zumo_tank/Zumo_robot/ZumoBot_Tank.cydsn/Generated_Source/PSoC5/cydevicegnu_trm.inc : 
+
+C:/Users/ilyap/Documents/PSoC\ Creator/Zumo_tank/Zumo_robot/ZumoBot_Tank.cydsn/Generated_Source/PSoC5/cyfittergnu.inc : 
+

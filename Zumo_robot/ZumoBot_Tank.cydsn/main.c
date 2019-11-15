@@ -311,52 +311,161 @@ void zmain(void)
 //IR receiverm - how to wait for IR remote commands
 void zmain(void)
 {
-    IR_Start();
+    uint8_t button_;
+    printf("\nStart\n");
     
-    printf("\n\nIR test\n");
-    
-    IR_flush(); // clear IR receive buffer
-    printf("Buffer cleared\n");
-    
-    bool led = false;
-    // Toggle led when IR signal is received
-    while(true)
-    {
-        IR_wait();  // wait for IR command
-        led = !led;
-        BatteryLed_Write(led);
-        if(led) printf("Led is ON\n");
-        else printf("Led is OFF\n");
-    }    
+    while(true){
+        button_ = SW1_Read();
+        if(button_==0){
+            IR_Start();
+            printf("\n\nIR test\n");
+            struct sensors_ ref;
+            struct sensors_ dig;
+            bool led = false,loop = true, startline= true;
+            int count =0;
+            motor_start();              // enable motor controller 
+            IR_flush(); // clear IR receive buffer
+            printf("Buffer cleared\n");
+            
+            reflectance_start();
+            reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000); // set center sensor threshold to 11000 and others to 9000
+            vTaskDelay(200);
+                while(startline){
+                    // read raw sensor values
+                    reflectance_read(&ref);
+                    reflectance_digital(&dig); 
+                    if(dig.l3 != 1 && dig.r3 != 1){
+                        motor_turn(50,50,50);       // motor forward
+                        Beep(60,80);
+                    }
+                    else{
+                        motor_forward(0,0);       // Stop motors
+                        startline = false;
+                    }
+                }
+            IR_wait();  // wait for IR command
+            led = !led;
+            BatteryLed_Write(led);   
+            
+            // Toggle led when IR signal is received
+            while(loop)
+            {   
+                if(led){
+                    // read raw sensor values
+                    reflectance_read(&ref);
+                    reflectance_digital(&dig); 
+                    
+                    if(dig.l3 == 1 && dig.r3 == 1 ){
+                        motor_turn(50,50,50);       // motor forward
+                        vTaskDelay(50);
+                        count++;
+                        printf("count %d \n",count);
+                        if(count >= 7){
+                            motor_forward(0,0);       // Stop motors
+                            loop = false;
+                        }
+                    }
+                    else{
+                         motor_turn(50,50,50);       // motor forward
+                        Beep(100,100);
+                    }
+                }
+                else {
+                    printf("Led is OFF\n");
+                    loop = false;
+                }
+               
+            }    
+        }
+    }
  }   
 #endif
 
 
-
-#if 0
-//IR receiver - read raw data
+#if 1
+//IR receiverm - how to wait for IR remote commands
 void zmain(void)
 {
-    IR_Start();
+    uint8_t button_;
+    printf("\nStart\n");
     
-    uint32_t IR_val; 
-    
-    printf("\n\nIR test\n");
-    
-    IR_flush(); // clear IR receive buffer
-    printf("Buffer cleared\n");
-    
-    // print received IR pulses and their lengths
-    while(true)
-    {
-        if(IR_get(&IR_val, portMAX_DELAY)) {
-            int l = IR_val & IR_SIGNAL_MASK; // get pulse length
-            int b = 0;
-            if((IR_val & IR_SIGNAL_HIGH) != 0) b = 1; // get pulse state (0/1)
-            printf("%d %d\r\n",b, l);
+    while(true){
+        button_ = SW1_Read();
+        if(button_==0){
+            IR_Start();
+            printf("\n\nIR test\n");
+            struct sensors_ ref;
+            struct sensors_ dig;
+            bool led = false,loop = true, startline= true;
+            int count =0;
+            motor_start();              // enable motor controller 
+            IR_flush(); // clear IR receive buffer
+            printf("Buffer cleared\n");
+            
+            reflectance_start();
+            reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000); // set center sensor threshold to 11000 and others to 9000
+            vTaskDelay(200);
+                while(startline){
+                    // read raw sensor values
+                    reflectance_read(&ref);
+                    reflectance_digital(&dig); 
+                    if(dig.l3 != 1 && dig.r3 != 1){
+                        motor_turn(50,50,50);       // motor forward
+                        Beep(60,80);
+                    }
+                    else{
+                        motor_forward(0,0);       // Stop motors
+                        startline = false;
+                    }
+                }
+            IR_wait();  // wait for IR command
+            led = !led;
+            BatteryLed_Write(led);   
+            
+            // Toggle led when IR signal is received
+            while(loop)
+            {   
+                if(led){
+                    // read raw sensor values
+                    reflectance_read(&ref);
+                    reflectance_digital(&dig); 
+                    
+                    if(dig.l2 == 1 && dig.r2 == 1 ){
+                        if((count==0)&&(count>=4)){
+                            motor_turn(50,50,50);       // motor forward
+                            vTaskDelay(50);
+                            count++;
+                        }
+                        if(count==1){
+                            motor_turn(200,0,50);       // motor turn
+                            vTaskDelay(50);
+                            count++;
+                        }
+                        if(count<=3){
+                            motor_turn(0,200,50);       // motor turn
+                            vTaskDelay(50);
+                            count++;
+                        }
+                        printf("count %d \n",count);
+                        if(count >= 4){
+                            motor_forward(0,0);       // Stop motors
+                            loop = false;
+                        }
+                    }
+                    else{
+                         motor_turn(50,50,50);       // motor forward
+                        Beep(100,100);
+                    }
+                }
+                else {
+                    printf("Led is OFF\n");
+                    loop = false;
+                }
+               
+            }    
         }
-    }    
- }   
+    }
+ }  
 #endif
 
 
@@ -426,7 +535,7 @@ void zmain(void)
 }
 #endif
 
-#if 1
+#if 0
 /* Example of how to use te Accelerometer!!!*/
 void zmain(void)
 {

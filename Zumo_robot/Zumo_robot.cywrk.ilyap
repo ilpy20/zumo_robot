@@ -159,7 +159,6 @@
 <v>Zumo_robot\ZumoBot_Tank\Generated_Source\PSoC5\Em_EEPROM_Dynamic</v>
 <v>Zumo_robot\ZumoBot_Tank\Generated_Source\PSoC5\I2C</v>
 <v>Zumo_robot\ZumoBot_Tank\Generated_Source\PSoC5\IR_isr</v>
-<v>Zumo_robot\ZumoBot_Tank\Generated_Source\PSoC5\IR_receiver</v>
 </VisibleNodeIds>
 </CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237>
 <CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="">
@@ -451,7 +450,16 @@
 </userData>
 </CyGuid_fdba8dfd-b15b-4469-9bbb-9e40c3e70997>
 <Unloaded />
-<OpenDocs />
+<OpenDocs>
+<name v=".\ZumoBot_Tank.cydsn\main.c" />
+</OpenDocs>
+<OpenDocsLayout><![CDATA[<?xml version="1.0"?><!--
+
+  Actipro Docking/MDI for WinForms
+  Copyright (c) 2001-2016 Actipro Software LLC.  All rights reserved.
+  http://www.actiprosoftware.com
+
+--><DocumentLayout Version="1.0"><LayoutData><TabbedMdiRootContainer Orientation="Horizontal"><TabbedMdiContainer Size="1098, 535" SelectedTabbedMdiWindow="50d5d45d-2616-4c8e-ae3f-a7a13de10c9b"><DocumentWindow Key="C:\Users\ilyap\Documents\PSoC Creator\Zumo_tank\Zumo_robot\ZumoBot_Tank.cydsn\main.c" Guid="50d5d45d-2616-4c8e-ae3f-a7a13de10c9b" /><ToolWindow Key="Start Page:bd4649ab-da6b-4d04-a663-c722b8bf99db:Start Page" Guid="f558e2cb-fa40-4d58-8622-152203809c14" /></TabbedMdiContainer></TabbedMdiRootContainer><FloatingContainers /></LayoutData></DocumentLayout>]]></OpenDocsLayout>
 <config v="" />
 <AutoUpdate v="true" />
 </CyGuid_843a90a4-0c4b-4e44-991d-05e7fb117a21>

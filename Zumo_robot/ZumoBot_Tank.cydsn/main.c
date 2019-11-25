@@ -431,12 +431,12 @@ void zmain(void)
                     reflectance_read(&ref);
                     reflectance_digital(&dig); 
                     
-                    if(dig.l3 == 1 && dig.r3 == 1 ){
+                    if(dig.l2 == 1 || dig.r2 == 1 ){
                         
                         if(count==2){
-                            motor_turn(225,10,50);       // motor turn
+                            motor_turn(225,10,500);       // motor turn
                             Beep(20,20);
-                            vTaskDelay(5);
+                            vTaskDelay(0);
                             //motor_turn(50,50,50);       // motor forward
                             //Beep(50,50);
                             //vTaskDelay(5);
@@ -444,9 +444,9 @@ void zmain(void)
                             printf("count %d \n",count);
                         }
                         if(count<=4){
-                            motor_turn(10,225,50);       // motor turn
+                            motor_turn(10,225,500);       // motor turn
                             Beep(20,20);
-                            vTaskDelay(5);
+                            vTaskDelay(0);
                             //motor_turn(50,50,50);       // motor forward
                             //Beep(50,50);
                             //vTaskDelay(5);
@@ -461,7 +461,7 @@ void zmain(void)
                         }
                         else{
                             motor_turn(50,50,50);       // motor forward
-                            vTaskDelay(5);
+                            vTaskDelay(0);
                             Beep(50,50);
                             //count++;
                             printf("count %d \n",count);
@@ -469,7 +469,7 @@ void zmain(void)
                     }
                     else{
                         motor_turn(50,50,50);       // motor forward
-                        vTaskDelay(5);
+                        vTaskDelay(0);
                         Beep(50,50);
                         //count++;
                         printf("count %d \n",count);

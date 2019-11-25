@@ -411,6 +411,117 @@ void zmain(void)
                     reflectance_digital(&dig); 
                     if(dig.l3 != 1 && dig.r3 != 1){
                         motor_turn(50,50,50);       // motor forward
+                        Beep(30,30);
+                    }
+                    else{
+                        motor_forward(0,0);       // Stop motors
+                        startline = false;
+                    }
+                }
+            IR_wait();  // wait for IR command
+            led = !led;
+            BatteryLed_Write(led);   
+            
+            // Toggle led when IR signal is received
+            while(loop)
+            {   
+                if(led){
+                    do {
+                        // read raw sensor values
+                    reflectance_read(&ref);
+                    reflectance_digital(&dig); 
+                    
+                    if(dig.l3 == 1 && dig.r3 == 1 ){
+                        
+                        if(count==2){
+                            motor_turn(225,10,50);       // motor turn
+                            Beep(20,20);
+                            vTaskDelay(5);
+                            //motor_turn(50,50,50);       // motor forward
+                            //Beep(50,50);
+                            //vTaskDelay(5);
+                            count++;
+                            printf("count %d \n",count);
+                        }
+                        if(count<=4){
+                            motor_turn(10,225,50);       // motor turn
+                            Beep(20,20);
+                            vTaskDelay(5);
+                            //motor_turn(50,50,50);       // motor forward
+                            //Beep(50,50);
+                            //vTaskDelay(5);
+                            count++;
+                            printf("count %d \n",count);
+                        }
+                       // printf("count %d \n",count);
+                        if(count == 5){
+                            motor_forward(0,0);       // Stop motors
+                            led = false;
+                            BatteryLed_Write(led);
+                        }
+                        else{
+                            motor_turn(50,50,50);       // motor forward
+                            vTaskDelay(5);
+                            Beep(50,50);
+                            //count++;
+                            printf("count %d \n",count);
+                        }
+                    }
+                    else{
+                        motor_turn(50,50,50);       // motor forward
+                        vTaskDelay(5);
+                        Beep(50,50);
+                        //count++;
+                        printf("count %d \n",count);
+                        /*if(count == 36){
+                            motor_forward(0,0);       // Stop motors
+                            led = false;
+                        }*/
+                    }
+                    
+                
+                    }while(led);
+                }
+                else {
+                    printf("Led is OFF\n");
+                    loop = false;
+                }
+               
+            }    
+        }
+    }
+ }  
+#endif
+
+#if 0
+//IR receiverm - how to wait for IR remote commands
+void zmain(void)
+{
+    uint8_t button_;
+    printf("\nStart\n");
+    
+    while(true){
+        button_ = SW1_Read();
+        if(button_==0){
+            IR_Start();
+            printf("\n\nIR test\n");
+            struct sensors_ ref;
+            struct sensors_ dig;
+            bool led = false,loop = true, startline= true;
+            int count =0;
+            motor_start();              // enable motor controller 
+            IR_flush(); // clear IR receive buffer
+            printf("Buffer cleared\n");
+            
+            reflectance_start();
+            reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000); // set center sensor threshold to 11000 and others to 9000
+            vTaskDelay(200);
+                while(startline){
+                    // read raw sensor values
+                    reflectance_read(&ref);
+                    reflectance_digital(&dig); 
+                    if(dig.l3 != 1 && dig.r3 != 1){
+                        motor_turn(50,50,50);       // motor forward
                         Beep(60,80);
                     }
                     else{
@@ -430,42 +541,30 @@ void zmain(void)
                     reflectance_read(&ref);
                     reflectance_digital(&dig); 
                     
-                    if(dig.l2 == 1 && dig.r2 == 1 ){
-                        if((count==0)&&(count>=4)){
-                            motor_turn(50,50,50);       // motor forward
-                            vTaskDelay(50);
-                            count++;
-                        }
-                        if(count==1){
-                            motor_turn(200,0,50);       // motor turn
-                            vTaskDelay(50);
-                            count++;
-                        }
-                        if(count<=3){
-                            motor_turn(0,200,50);       // motor turn
-                            vTaskDelay(50);
-                            count++;
-                        }
+                    if(dig.l3 == 1 && dig.r3 == 1 ){
+                        motor_turn(50,50,50);       // motor forward
+                        vTaskDelay(50);
+                        count++;
                         printf("count %d \n",count);
-                        if(count >= 4){
+                        if(count >= 2){
                             motor_forward(0,0);       // Stop motors
                             loop = false;
                         }
                     }
-                    else{
-                         motor_turn(50,50,50);       // motor forward
+                    else if(dig.l1 == 1 && dig.r1 == 1 ){
+                        motor_turn(50,50,50);       // motor forward
                         Beep(100,100);
                     }
-                }
-                else {
-                    printf("Led is OFF\n");
-                    loop = false;
+                    else{
+                        motor_turn(0,30,0);  //eta huinya isobretena ukropami
+                        Beep(100,100);       //idu buhat cherez chas
+                    }
                 }
                
             }    
         }
     }
- }  
+ }   
 #endif
 
 
@@ -702,4 +801,10 @@ void zmain(void)
  }   
 #endif
 
+#if 0
+//main project
+void zmain(void){
+    
+}
+#endif
 /* [] END OF FILE */

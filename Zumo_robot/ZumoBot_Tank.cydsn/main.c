@@ -433,38 +433,42 @@ void zmain(void)
                     
                     if(dig.l3 == 1 && dig.r3 == 1 ){
                         
-                        if(count==2){
+                        if(count==1){
+                            count++;
                             motor_turn(225,10,500);       // motor turn
                             Beep(20,20);
                             vTaskDelay(0);
                             //motor_turn(50,50,50);       // motor forward
                             //Beep(50,50);
                             //vTaskDelay(5);
-                            count++;
                             printf("count %d \n",count);
                         }
-                        if(count<=4){
+                        if(count<=3){
+                            count++;
                             motor_turn(10,225,500);       // motor turn
                             Beep(20,20);
                             vTaskDelay(0);
                             //motor_turn(50,50,50);       // motor forward
                             //Beep(50,50);
                             //vTaskDelay(0);
-                            count++;
+                            //count++;
                             printf("count %d \n",count);
                         }
                        // printf("count %d \n",count);
-                        if(count == 5){
+                        if(count == 4){
                             motor_forward(0,0);       // Stop motors
                             led = false;
                             BatteryLed_Write(led);
-                            loop = false;
+                            //loop = false;
                         }
-                        else{
-                            motor_turn(50,50,50);       // motor forward
+                        if (count == 0){
+                            do{
+                                motor_turn(50,50,50);       // motor forward
+                            }while(dig.l3 != 1 && dig.r3 != 1 );
+                            
                             vTaskDelay(0);
                             Beep(50,50);
-                            //count++;
+                            count++;
                             printf("count %d \n",count);
                         }
                     }

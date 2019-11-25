@@ -426,7 +426,7 @@ void zmain(void)
             while(loop)
             {   
                 if(led){
-                    do {
+                    //do {
                         // read raw sensor values
                     reflectance_read(&ref);
                     reflectance_digital(&dig); 
@@ -449,7 +449,7 @@ void zmain(void)
                             vTaskDelay(0);
                             //motor_turn(50,50,50);       // motor forward
                             //Beep(50,50);
-                            //vTaskDelay(5);
+                            //vTaskDelay(0);
                             count++;
                             printf("count %d \n",count);
                         }
@@ -458,6 +458,7 @@ void zmain(void)
                             motor_forward(0,0);       // Stop motors
                             led = false;
                             BatteryLed_Write(led);
+                            loop = false;
                         }
                         else{
                             motor_turn(50,50,50);       // motor forward
@@ -480,7 +481,8 @@ void zmain(void)
                     }
                     
                 
-                    }while(led);
+                    //}while(led);
+                    
                 }
                 else {
                     printf("Led is OFF\n");

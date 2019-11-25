@@ -431,7 +431,7 @@ void zmain(void)
                     reflectance_read(&ref);
                     reflectance_digital(&dig); 
                     
-                    if(dig.l2 == 1 || dig.r2 == 1 ){
+                    if(dig.l3 == 1 && dig.r3 == 1 ){
                         
                         if(count==2){
                             motor_turn(225,10,500);       // motor turn
@@ -792,6 +792,7 @@ void zmain(void)
 
             // print the current time
             printf("%2d:%02d.%02d\n", now.Hour, now.Min, now.Sec);
+            print_mqtt("Zumo006/time", "%2d:%02d.%02d", now.Hour, now.Min, now.Sec);
             
             // wait until button is released
             while(SW1_Read() == 0) vTaskDelay(50);

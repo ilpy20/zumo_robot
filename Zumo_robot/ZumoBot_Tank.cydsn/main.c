@@ -450,10 +450,10 @@ void zmain(void)
                             motor_forward(0,0);
                             count++;
                             if (count==1){
-                                motor_turn(100,-10,500);
+                                motor_turn_left(10,100,500);
                             }
                             if (count<=3){
-                                motor_turn(-10,100,500);
+                                motor_turn_right(100,10,500);
                             }
                             if (count==4){
                                 motor_forward(0,0);       // Stop motors

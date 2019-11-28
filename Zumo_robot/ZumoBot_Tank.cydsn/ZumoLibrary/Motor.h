@@ -20,4 +20,8 @@ void motor_turn(uint8 l_speed, uint8 r_speed, uint32 delay);
 /* moving backward */
 void motor_backward(uint8 speed,uint32 delay);
 
+void motor_turn_left(uint8 speed1, uint8 speed2,uint32 delay);
+
+void motor_turn_right(uint8 speed1, uint8 speed2 ,uint32 delay);
+
 #endif

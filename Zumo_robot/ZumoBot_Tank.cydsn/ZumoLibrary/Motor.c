@@ -73,3 +73,33 @@ void motor_backward(uint8 speed,uint32 delay)
     PWM_WriteCompare2(speed); 
     vTaskDelay(delay);
 }
+
+/**
+* @brief    Moving motors left
+* @details  setting backward mode to each motors and gives same speed to each side of PWM
+* @param    uint8 speed : speed value
+* @param    uint32 delay : delay time
+*/
+void motor_turn_left(uint8 speed1, uint8 speed2,uint32 delay)
+{
+    MotorDirLeft_Write(1);      // set LeftMotor backward mode
+    MotorDirRight_Write(0);     // set RightMotor backward mode
+    PWM_WriteCompare1(speed1); 
+    PWM_WriteCompare2(speed2); 
+    vTaskDelay(delay);
+}
+
+/**
+* @brief    Moving motors right
+* @details  setting backward mode to each motors and gives same speed to each side of PWM
+* @param    uint8 speed : speed value
+* @param    uint32 delay : delay time
+*/
+void motor_turn_right(uint8 speed1, uint8 speed2,uint32 delay)
+{
+    MotorDirLeft_Write(0);      // set LeftMotor backward mode
+    MotorDirRight_Write(1);     // set RightMotor backward mode
+    PWM_WriteCompare1(speed1); 
+    PWM_WriteCompare2(speed2); 
+    vTaskDelay(delay);
+}

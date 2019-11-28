@@ -396,7 +396,7 @@ void zmain(void)
             printf("\n\nIR test\n");
             struct sensors_ ref;
             struct sensors_ dig;
-            bool led = false,loop = true, startline= true;
+            bool led = false,loop = true, startline= true/*, crossline= true*/;
             int count =0;
             motor_start();              // enable motor controller 
             IR_flush(); // clear IR receive buffer
@@ -410,8 +410,8 @@ void zmain(void)
                     reflectance_read(&ref);
                     reflectance_digital(&dig); 
                     if(dig.l3 != 1 && dig.r3 != 1){
-                        motor_turn(50,50,50);       // motor forward
-                        Beep(30,30);
+                        motor_turn(50,50,0);       // motor forward
+                        //Beep(60,80);
                     }
                     else{
                         motor_forward(0,0);       // Stop motors
@@ -421,68 +421,83 @@ void zmain(void)
             IR_wait();  // wait for IR command
             led = !led;
             BatteryLed_Write(led);   
-            
+            /*while(crossline){
+                    // read raw sensor values
+                    reflectance_read(&ref);
+                    reflectance_digital(&dig); 
+                    if(dig.l3 != 1 && dig.r3 != 1){
+                        motor_turn(50,50,0);       // motor forward
+                        //Beep(60,80);
+                    }
+                    else{
+                        motor_turn(20,20,0);
+                        motor_forward(0,0);       // Stop motors
+                        crossline = false;
+                    }
+                }*/
             // Toggle led when IR signal is received
             while(loop)
             {   
                 if(led){
                     //do {
                         // read raw sensor values
-                    reflectance_read(&ref);
+                    //reflectance_read(&ref);
                     reflectance_digital(&dig); 
                     
-                    if(dig.l3 == 1 && dig.r3 == 1 ){
+                   // if(dig.l3 == 1 && dig.l2 == 1 && dig.l1 == 1 && dig.r3 == 1 && dig.r2 == 1 && dig.r1 == 1){
                         
-                        if(count==1){
+                        if(dig.l3 == 1 && dig.l2 == 1 && dig.l1 == 1 && dig.r3 == 1 && dig.r2 == 1 && dig.r1 == 1){
+                            motor_forward(0,0);
                             count++;
-                            motor_turn(225,10,500);       // motor turn
-                            Beep(20,20);
+                            if (count==1){
+                                motor_turn(100,-10,500);
+                            }
+                            if (count<=3){
+                                motor_turn(-10,100,500);
+                            }
+                            if (count==4){
+                                motor_forward(0,0);       // Stop motors
+                                led = false;
+                                BatteryLed_Write(led);
+                            }
+                        } 
+                        if(dig.r2 == 1 && dig.r1 == 1){
+                            //count++;
+                            motor_turn(100,10,0);       // motor turn left
+                            //Beep(20,20);
                             vTaskDelay(0);
-                            //motor_turn(50,50,50);       // motor forward
-                            //Beep(50,50);
-                            //vTaskDelay(5);
+                            
                             printf("count %d \n",count);
                         }
-                        if(count<=3){
-                            count++;
-                            motor_turn(10,225,500);       // motor turn
-                            Beep(20,20);
-                            vTaskDelay(0);
-                            //motor_turn(50,50,50);       // motor forward
-                            //Beep(50,50);
-                            //vTaskDelay(0);
+                        if(dig.l2 == 1 && dig.l1 == 1){
                             //count++;
+                            motor_turn(10,100,0);       // motor turn right
+                           // Beep(20,20);
+                            vTaskDelay(0);
+                            
                             printf("count %d \n",count);
                         }
                        // printf("count %d \n",count);
-                        if(count == 4){
-                            motor_forward(0,0);       // Stop motors
-                            led = false;
-                            BatteryLed_Write(led);
-                            //loop = false;
-                        }
-                        if (count == 0){
-                            do{
-                                motor_turn(50,50,50);       // motor forward
-                            }while(dig.l3 != 1 && dig.r3 != 1 );
+                        if (dig.l1 == 1 && dig.r1 == 1){
                             
+                            motor_turn(50,50,0);       // motor forward
                             vTaskDelay(0);
-                            Beep(50,50);
-                            count++;
+                            //Beep(50,50);
+                            //count++;
                             printf("count %d \n",count);
                         }
-                    }
-                    else{
-                        motor_turn(50,50,50);       // motor forward
-                        vTaskDelay(0);
-                        Beep(50,50);
-                        //count++;
-                        printf("count %d \n",count);
-                        /*if(count == 36){
-                            motor_forward(0,0);       // Stop motors
-                            led = false;
-                        }*/
-                    }
+                   // }
+//                    else{
+//                        motor_turn(50,50,0);       // motor forward
+//                        vTaskDelay(0);
+//                        //Beep(50,50);
+//                        //count++;
+//                        printf("count %d \n",count);
+//                        /*if(count == 36){
+//                            motor_forward(0,0);       // Stop motors
+//                            led = false;
+//                        }*/
+//                    }
                     
                 
                     //}while(led);

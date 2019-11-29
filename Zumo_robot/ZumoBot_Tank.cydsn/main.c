@@ -492,9 +492,12 @@ void zmain(void)
 //IR receiverm - how to wait for IR remote commands
 void zmain(void)
 {
+    //IR receiverm - how to wait for IR remote commands
+void zmain(void);
+
     uint8_t button_;
     printf("\nStart\n");
-    
+
     while(true){
         button_ = SW1_Read();
         if(button_==0){
@@ -507,7 +510,7 @@ void zmain(void)
             motor_start();              // enable motor controller 
             IR_flush(); // clear IR receive buffer
             printf("Buffer cleared\n");
-            
+
             reflectance_start();
             reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000); // set center sensor threshold to 11000 and others to 9000
             vTaskDelay(200);
@@ -519,6 +522,7 @@ void zmain(void)
                         motor_turn(50,50,50);       // motor forward
                         Beep(60,80);
                     }
+
                     else{
                         motor_forward(0,0);       // Stop motors
                         startline = false;
@@ -527,7 +531,7 @@ void zmain(void)
             IR_wait();  // wait for IR command
             led = !led;
             BatteryLed_Write(led);   
-            
+
             // Toggle led when IR signal is received
             while(loop)
             {   
@@ -535,31 +539,47 @@ void zmain(void)
                     // read raw sensor values
                     reflectance_read(&ref);
                     reflectance_digital(&dig); 
-                    
-                    if(dig.l3 == 1 && dig.r3 == 1 ){
-                        motor_turn(50,50,50);       // motor forward
-                        vTaskDelay(50);
+
+                    if(dig.l3 == 1 && dig.r3 == 1 && dig.l1 == 1 && dig.r1 == 1){
                         count++;
+                        printf("\nStart\n");
                         printf("count %d \n",count);
+
+
+                        while (dig.r3 == 1 && dig.l3 == 1){
+                         motor_turn(50,49,0);
+                        reflectance_digital(&dig);
+                        }
                         if(count >= 2){
-                            motor_forward(0,0);       // Stop motors
-                            loop = false;
+                            motor_forward(210,0);       // Stop motors
                         }
                     }
-                    else if(dig.l1 == 1 && dig.r1 == 1 ){
-                        motor_turn(50,50,50);       // motor forward
-                        Beep(100,100);
+
+                    else if (dig.l1 == 1 && dig.r1 == 1){
+                        motor_turn(210,210,0);   //goes forward lul
+                        printf("%5d %5d", ref.l1, ref.r1);
                     }
-                    else{
-                        motor_turn(0,30,0);  //eta huinya isobretena ukropami
-                        Beep(100,100);       //idu buhat cherez chas
+                    else if (dig.l1 == 0 && dig.r1 == 1){
+                        motor_turn(210,0,0);  //turns right lul
+                        printf("%5d %5d", ref.l1, ref.r1);
+                    }
+                    else if (dig.l1 == 1 && dig.r1 == 0){
+                        motor_turn(0,210,0);   ///should turn left, right lul??   
+                        printf("%5d %5d", ref.l1, ref.r1);
+                    }
+                    else if (dig.l3 == 1 && dig.r3 == 1 && dig.l1 == 1 && dig.r1 == 1 && dig.l2 == 1 && dig.r2 == 1) {
+                        motor_turn(0,0,100000);   ///should stop, right lul??   
+
+
+                        }
                     }
                 }
-               
+
+
             }    
         }
-    }
- }   
+
+}   
 #endif
 
 

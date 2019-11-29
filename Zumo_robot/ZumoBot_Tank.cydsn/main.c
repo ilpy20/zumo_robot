@@ -720,6 +720,130 @@ void zmain(void)
  }   
 #endif
 
+#if 0
+
+    
+void zmain(void)
+{
+    Ultra_Start();
+    motor_start(0,0);
+    motor_forward(0,0);
+    
+    vTaskDelay(3000);
+    
+    while(true){
+        int distance = Ultra_GetDistance();
+    
+        if(distance <= 10 && distance !=0){
+            int r = rand() % 2;      // Returns a pseudo-random integer between 0 and RAND_MAX.
+            if(r == 0){
+                motor_turn(50,200,500);
+                vTaskDelay(0);
+                print_mqtt("Zumo006/turn", "left");
+                //motor_forward(0,0);
+            }
+            else{
+                motor_turn(200,50,500);
+                vTaskDelay(0);
+                print_mqtt("Zumo006/turn", "right");
+                //motor_forward(0,0);
+            }
+            motor_forward(100,100);
+        }
+        
+    }   
+}
+#endif
+
+#if 0
+//IR receiverm - how to wait for IR remote commands
+void zmain(void)
+{
+    RTC_Start(); // start real time clock
+    
+    RTC_TIME_DATE now;
+
+    // set current time
+    now.Hour = 12;
+    now.Min = 34;
+    now.Sec = 56;
+    now.DayOfMonth = 25;
+    now.Month = 9;
+    now.Year = 2018;
+    RTC_WriteTime(&now); // write the time to real time clock
+    
+    uint8_t button_;
+    printf("\nStart\n");
+    
+    while(true){
+        button_ = SW1_Read();
+        if(button_==0){
+            IR_Start();
+            printf("\n\nIR test\n");
+            struct sensors_ ref;
+            struct sensors_ dig;
+            bool led = false,loop = true, startline= true;
+            int count =0;
+            motor_start();              // enable motor controller 
+            IR_flush(); // clear IR receive buffer
+            printf("Buffer cleared\n");
+            
+            reflectance_start();
+            reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000); // set center sensor threshold to 11000 and others to 9000
+            vTaskDelay(200);
+                while(startline){
+                    // read raw sensor values
+                    reflectance_read(&ref);
+                    reflectance_digital(&dig); 
+                    if(dig.l3 != 1 && dig.r3 != 1){
+                        motor_turn(50,50,50);       // motor forward
+                        Beep(60,80);
+                    }
+                    else{
+                        motor_forward(0,0);       // Stop motors
+                        startline = false;
+                    }
+                }
+            IR_wait();  // wait for IR command
+            led = !led;
+            BatteryLed_Write(led);   
+            
+            // Toggle led when IR signal is received
+            while(loop)
+            {   
+                if(led){
+                    // read raw sensor values
+                    reflectance_read(&ref);
+                    reflectance_digital(&dig); 
+                    
+                    if(dig.l3 == 1 && dig.r3 == 1 ){
+                        motor_turn(50,50,50);       // motor forward
+                        motor_forward(0,0);       // Stop motors
+                        vTaskDelay(50);
+                        count++;
+                        printf("count %d \n",count);
+                        printf("%2d:%02d.%02d\n", now.Hour, now.Min, now.Sec);
+                        print_mqtt("Zumo006/lap", "%2d:%02d.%02d", now.Hour, now.Min, now.Sec);
+                        /*if(count >= 7){
+                            motor_forward(0,0);       // Stop motors
+                            loop = false;
+                        }
+                    }
+                    else{
+                         motor_turn(50,50,50);       // motor forward
+                        Beep(100,100);
+                    }
+                }
+                else {
+                    printf("Led is OFF\n");
+                    loop = false;
+                }
+               
+            }    
+        }
+    }
+ }   
+#endif
 
 #if 0
 void zmain(void)

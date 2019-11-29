@@ -121,38 +121,39 @@ void zmain(void)
     //fflush(stdout);
     scanf("%d", &age);
     end = xTaskGetTickCount();
-    printf("You are [%s], age = %d\n", name, age);
+    int time_long = end - start;
+    //printf("You are [%s], age = %d\n", name, age);
     if (age <= 21){
-        if(end-start < 300){
-            printf("Super fast dude!");
+        if(time_long < 3000){
+            printf("\nSuper fast dude!");
         }
-        else if((end-start >= 300)&&(end-start <=500)){
-            printf("So mediocre.");
+        else if((time_long >= 3000)&&(time_long <=5000)){
+            printf("\nSo mediocre.");
         }
         else{
-            printf("My granny is faster than you!");
+            printf("\nMy granny is faster than you!");
         }
     }
     else if((age >= 22)&&(age<=50)){
-        if(end-start < 3){
-            printf("Be quick or be dead");
+        if(time_long < 3000){
+            printf("\nBe quick or be dead");
         }
-        else if((end-start >= 300)&&(end-start <=500)){
-            printf("You're so average.");
+        else if((time_long >= 3000)&&(time_long <=5000)){
+            printf("\nYou're so average.");
         }
         else{
-            printf("Have you been smoking something illegal?");
+            printf("\nHave you been smoking something illegal?");
         }
     }
     else{
-        if(end-start <= 300){
-            printf("Still going strong");
+        if(time_long <= 3000){
+            printf("\nStill going strong");
         }
-        else if((end-start >= 4)&&(end-start <=5)){
-            printf("You are doing ok for your age.");
+        else if((time_long >= 4000)&&(time_long <=5000)){
+            printf("\nYou are doing ok for your age.");
         }
         else{
-            printf("Do they still allow you to drive?");
+            printf("\nDo they still allow you to drive?");
         }
     }
     while(true)
@@ -382,7 +383,7 @@ void zmain(void)
 #endif
 
 
-#if 1
+#if 0
 //IR receiverm - how to wait for IR remote commands
 void zmain(void)
 {
@@ -432,7 +433,7 @@ void zmain(void)
                     reflectance_digital(&dig); 
                     
                    
-                        if(dig.l3 == 1 && dig.l2 == 1 && dig.l1 == 1 && dig.r3 == 1 && dig.r2 == 1 && dig.r1 == 1){
+                        /*if(dig.l3 == 1 && dig.l2 == 1 && dig.l1 == 1 && dig.r3 == 1 && dig.r2 == 1 && dig.r1 == 1){
                             motor_forward(0,0);
                             count++;
                             if(count==1){
@@ -449,7 +450,7 @@ void zmain(void)
                                 led = false;
                                 BatteryLed_Write(led);
                             }
-                        } 
+                        } */
                         if(dig.r2 == 1 && dig.r1 == 1){
                             //count++;
                             motor_turn(100,10,0);       // motor turn left
@@ -740,7 +741,7 @@ void zmain(void)
  }   
 #endif
 
-#if 0
+#if 1
 
     
 void zmain(void)
@@ -867,7 +868,7 @@ void zmain(void)
             }    
         }
     }
- }   
+ }
 #endif
 
 #if 0

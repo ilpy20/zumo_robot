@@ -421,20 +421,7 @@ void zmain(void)
             IR_wait();  // wait for IR command
             led = !led;
             BatteryLed_Write(led);   
-            /*while(crossline){
-                    // read raw sensor values
-                    reflectance_read(&ref);
-                    reflectance_digital(&dig); 
-                    if(dig.l3 != 1 && dig.r3 != 1){
-                        motor_turn(50,50,0);       // motor forward
-                        //Beep(60,80);
-                    }
-                    else{
-                        motor_turn(20,20,0);
-                        motor_forward(0,0);       // Stop motors
-                        crossline = false;
-                    }
-                }*/
+            
             // Toggle led when IR signal is received
             while(loop)
             {   
@@ -444,18 +431,20 @@ void zmain(void)
                     //reflectance_read(&ref);
                     reflectance_digital(&dig); 
                     
-                   // if(dig.l3 == 1 && dig.l2 == 1 && dig.l1 == 1 && dig.r3 == 1 && dig.r2 == 1 && dig.r1 == 1){
-                        
+                   
                         if(dig.l3 == 1 && dig.l2 == 1 && dig.l1 == 1 && dig.r3 == 1 && dig.r2 == 1 && dig.r1 == 1){
                             motor_forward(0,0);
                             count++;
-                            if (count==1){
+                            if(count==1){
+                                motor_turn(50,50,50);       // motor forward
+                            }
+                            if (count==2){
                                 motor_turn_left(10,100,500);
                             }
-                            if (count<=3){
+                            if (count<=4){
                                 motor_turn_right(100,10,500);
                             }
-                            if (count==4){
+                            if (count==5){
                                 motor_forward(0,0);       // Stop motors
                                 led = false;
                                 BatteryLed_Write(led);
@@ -486,22 +475,7 @@ void zmain(void)
                             //count++;
                             printf("count %d \n",count);
                         }
-                   // }
-//                    else{
-//                        motor_turn(50,50,0);       // motor forward
-//                        vTaskDelay(0);
-//                        //Beep(50,50);
-//                        //count++;
-//                        printf("count %d \n",count);
-//                        /*if(count == 36){
-//                            motor_forward(0,0);       // Stop motors
-//                            led = false;
-//                        }*/
-//                    }
-                    
-                
-                    //}while(led);
-                    
+                   
                 }
                 else {
                     printf("Led is OFF\n");

@@ -763,13 +763,18 @@ void zmain(void)
     
     RTC_TIME_DATE now;
 
+    time_t myTime;
+    struct tm * timeinfo;
+    time( &myTime );
+    timeinfo = localtime( &myTime );
+    
     // set current time
-    now.Hour = 12;
-    now.Min = 34;
-    now.Sec = 56;
-    now.DayOfMonth = 25;
-    now.Month = 9;
-    now.Year = 2018;
+    now.Hour = timeinfo->tm_hour;
+    now.Min = timeinfo->tm_min;
+    now.Sec = timeinfo->tm_sec6;
+    now.DayOfMonth = timeinfo->tm_mday;
+    now.Month = timeinfo->tm_mon+1;
+    now.Year = timeinfo->tm_year+1900;
     RTC_WriteTime(&now); // write the time to real time clock
     
     uint8_t button_;

@@ -951,7 +951,7 @@ void zmain(void)
 //main project
 void zmain(void)
 {
-    
+    struct accData_ data;
     
     uint8_t button_;
     printf("\nStart\n");
@@ -1003,38 +1003,16 @@ void zmain(void)
                     reflectance_read(&ref);
                     reflectance_digital(&dig); 
 
-                    if(dig.l3 == 1 && dig.r3 == 1 && dig.l1 == 1 && dig.r1 == 1){
-                        count++;
-                        printf("\nStart\n");
-                        printf("count %d \n",count);
-
-
-                        while (dig.r3 == 1 && dig.l3 == 1){
-                         motor_turn(50,49,0);
-                        reflectance_digital(&dig);
+                    LSM303D_Read_Acc(&data);
+                    do{
+                        motor_turn(50,50,0);
+                        if(data.accX<-4000){
+                            print_mqtt("Zumo006/hit","%d", CySysTickGetValue());
                         }
-                        if(count >= 2){
-                            motor_forward(210,0);       // Stop motors
-                        }
-                    }
-
-                    else if (dig.l1 == 1 && dig.r1 == 1){
-                        motor_turn(210,210,0);   //goes forward lul
-                        printf("%5d %5d", ref.l1, ref.r1);
-                    }
-                    else if (dig.l1 == 0 && dig.r1 == 1){
-                        motor_turn(210,0,0);  //turns right lul
-                        printf("%5d %5d", ref.l1, ref.r1);
-                    }
-                    else if (dig.l1 == 1 && dig.r1 == 0){
-                        motor_turn(0,210,0);   ///should turn left, right lul??   
-                        printf("%5d %5d", ref.l1, ref.r1);
-                    }
-                    else if (dig.l3 == 1 && dig.r3 == 1 && dig.l1 == 1 && dig.r1 == 1 && dig.l2 == 1 && dig.r2 == 1) {
-                        motor_turn(0,0,100000);   ///should stop, right lul??   
-
-
-                        }
+                        
+                    }while(dig.l3 != 1 && dig.r3 != 1);
+                    
+                    
                     }
                
             }

@@ -963,7 +963,7 @@ void zmain(void)
             printf("\n\nIR test\n");
             struct sensors_ ref;
             struct sensors_ dig;
-            bool led = false,loop = true, startline= true;
+            bool led = false,loop1 = true, startline= true, loop2 = true;
             int count =0;
             motor_start();              // enable motor controller
             print_mqtt("Zumo006/ready","line");
@@ -996,24 +996,39 @@ void zmain(void)
             BatteryLed_Write(led);   
             
             // Toggle led when IR signal is received
-            while(loop)
+            while(loop1)
             {   
                 if(led){
+                    while(loop2){
                     // read raw sensor values
                     reflectance_read(&ref);
                     reflectance_digital(&dig); 
 
                     LSM303D_Read_Acc(&data);
                     do{
-                        motor_turn(50,50,0);
+                        motor_forward(100,100);
                         if(data.accX<-4000){
                             print_mqtt("Zumo006/hit","%d", CySysTickGetValue());
+                            int r = rand() % 2;      // Returns a pseudo-random integer between 0 and RAND_MAX.
+                            if(r == 0){
+                                //motor_backward(80,50);
+                                motor_turn(200,50,500);
+                                vTaskDelay(0);
+                                //motor_forward(0,0);
+                            }
+                            else{
+                                //motor_backward(80,50);
+                                motor_turn(50,200,500);
+                                vTaskDelay(0);
+                                //motor_forward(0,0);
+                            }
+                            motor_forward(100,100);
                         }
                         
                     }while(dig.l3 != 1 && dig.r3 != 1);
-                    
-                    
+                    motor_turn(50,200,1000);
                     }
+                }
                
             }
             int end = CySysTickGetValue();

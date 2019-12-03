@@ -741,7 +741,7 @@ void zmain(void)
  }   
 #endif
 
-#if 1
+#if 0
 
     
 void zmain(void)
@@ -947,10 +947,103 @@ void zmain(void)
  }   
 #endif
 
-#if 0
+#if 1
 //main project
-void zmain(void){
+void zmain(void)
+{
     
-}
+    
+    uint8_t button_;
+    printf("\nStart\n");
+    
+    while(true){
+        button_ = SW1_Read();
+        if(button_==0){
+            IR_Start();
+            printf("\n\nIR test\n");
+            struct sensors_ ref;
+            struct sensors_ dig;
+            bool led = false,loop = true, startline= true;
+            int count =0;
+            motor_start();              // enable motor controller
+            print_mqtt("Zumo006/ready","line");
+            IR_flush(); // clear IR receive buffer
+            printf("Buffer cleared\n");
+            
+            reflectance_start();
+            reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000); // set center sensor threshold to 11000 and others to 9000
+            vTaskDelay(200);
+                while(startline){
+                    // read raw sensor values
+                    reflectance_read(&ref);
+                    reflectance_digital(&dig); 
+                    if(dig.l3 != 1 && dig.r3 != 1){
+                        motor_turn(50,50,50);       // motor forward
+                        Beep(60,80);
+                    }
+                    else{
+                        motor_forward(0,0);       // Stop motors
+                        startline = false;
+                    }
+                }
+            print_mqtt("Zumo006/ready","line");
+            IR_wait();  // wait for IR command
+            CySysTickEnable();
+            CySysTickStart();
+            int start = CySysTickGetValue();
+            print_mqtt("Zumo006/start","%d", start);
+            led = !led;
+            BatteryLed_Write(led);   
+            
+            // Toggle led when IR signal is received
+            while(loop)
+            {   
+                if(led){
+                    // read raw sensor values
+                    reflectance_read(&ref);
+                    reflectance_digital(&dig); 
+
+                    if(dig.l3 == 1 && dig.r3 == 1 && dig.l1 == 1 && dig.r1 == 1){
+                        count++;
+                        printf("\nStart\n");
+                        printf("count %d \n",count);
+
+
+                        while (dig.r3 == 1 && dig.l3 == 1){
+                         motor_turn(50,49,0);
+                        reflectance_digital(&dig);
+                        }
+                        if(count >= 2){
+                            motor_forward(210,0);       // Stop motors
+                        }
+                    }
+
+                    else if (dig.l1 == 1 && dig.r1 == 1){
+                        motor_turn(210,210,0);   //goes forward lul
+                        printf("%5d %5d", ref.l1, ref.r1);
+                    }
+                    else if (dig.l1 == 0 && dig.r1 == 1){
+                        motor_turn(210,0,0);  //turns right lul
+                        printf("%5d %5d", ref.l1, ref.r1);
+                    }
+                    else if (dig.l1 == 1 && dig.r1 == 0){
+                        motor_turn(0,210,0);   ///should turn left, right lul??   
+                        printf("%5d %5d", ref.l1, ref.r1);
+                    }
+                    else if (dig.l3 == 1 && dig.r3 == 1 && dig.l1 == 1 && dig.r1 == 1 && dig.l2 == 1 && dig.r2 == 1) {
+                        motor_turn(0,0,100000);   ///should stop, right lul??   
+
+
+                        }
+                    }
+               
+            }
+            int end = CySysTickGetValue();
+            print_mqtt("Zumo006/stop","%d", end);
+            CySysTickStop();
+            print_mqtt("Zumo006/time","%d", end - start);
+        }
+    }
+ }
 #endif
 /* [] END OF FILE */

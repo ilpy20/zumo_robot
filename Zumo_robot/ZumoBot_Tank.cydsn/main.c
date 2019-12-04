@@ -1005,41 +1005,35 @@ void zmain(void)
                     reflectance_digital(&dig); 
 
                     LSM303D_Read_Acc(&data);
-                    do{
+                    while(dig.l2 != 1 || dig.r2 != 1){
                         //motor_turn(50,50,0);
                         if(data.accX<-4000){
                             print_mqtt("Zumo006/hit","%d", CySysTickGetValue());
                             int r = rand() % 2;      // Returns a pseudo-random integer between 0 and RAND_MAX.
+                            int r1 = rand() % 500;
                             if(r == 0){
                                 //motor_backward(80,50);
-                                motor_turn(200,50,500);
+                                motor_turn(200,50,r1);
                                 vTaskDelay(0);
-                                //motor_forward(0,0);
                             }
                             else{
-                                //motor_backward(80,50);
-                                motor_turn(50,200,500);
+                                motor_turn(50,200,r1);
                                 vTaskDelay(0);
-                                //motor_forward(0,0);
                             }
-                            //motor_turn(50,50,0);
                         }
                         else{
                             motor_turn(50,50,0);
                         }
                         
-                    }while(dig.l3 != 1 || dig.r3 != 1);
-                    int r1 = rand() % 3;
-                    if(r1==0) {
-                        motor_turn(50,200,1000);
+                    }
+                    int r2 = rand() % 1000;
+                    int r = rand() % 2;      // Returns a pseudo-random integer between 0 and RAND_MAX.
+                    if(r==0) {
+                        motor_turn(50,200,r2);
                         vTaskDelay(0);
                     }
-                    if(r1==1) {
-                        motor_turn(50,200,500);
-                        vTaskDelay(0);
-                    }
-                    if(r1==2) {
-                        motor_turn(200,50,500);
+                    else {
+                        motor_turn(50,200,r2);
                         vTaskDelay(0);
                     }
                     }

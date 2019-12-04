@@ -853,7 +853,7 @@ void zmain(void)
                         /*if(count >= 7){
                             motor_forward(0,0);       // Stop motors
                             loop = false;
-                        }
+                        }*/
                     }
                     else{
                          motor_turn(50,50,50);       // motor forward
@@ -931,9 +931,9 @@ void zmain(void)
     {
         if(SW1_Read() == 0) {
             // read the current time
-            RTC_DisableInt(); /* Disable Interrupt of RTC Component */
-            now = *RTC_ReadTime(); /* copy the current time to a local variable */
-            RTC_EnableInt(); /* Enable Interrupt of RTC Component */
+            RTC_DisableInt(); // Disable Interrupt of RTC Component
+            now = *RTC_ReadTime(); // copy the current time to a local variable
+            RTC_EnableInt(); // Enable Interrupt of RTC Component
 
             // print the current time
             printf("%2d:%02d.%02d\n", now.Hour, now.Min, now.Sec);
@@ -1006,7 +1006,7 @@ void zmain(void)
 
                     LSM303D_Read_Acc(&data);
                     do{
-                        motor_forward(100,100);
+                        //motor_turn(50,50,0);
                         if(data.accX<-4000){
                             print_mqtt("Zumo006/hit","%d", CySysTickGetValue());
                             int r = rand() % 2;      // Returns a pseudo-random integer between 0 and RAND_MAX.
@@ -1022,11 +1022,26 @@ void zmain(void)
                                 vTaskDelay(0);
                                 //motor_forward(0,0);
                             }
-                            motor_forward(100,100);
+                            //motor_turn(50,50,0);
+                        }
+                        else{
+                            motor_turn(50,50,0);
                         }
                         
-                    }while(dig.l3 != 1 && dig.r3 != 1);
-                    motor_turn(50,200,1000);
+                    }while(dig.l3 != 1 || dig.r3 != 1);
+                    int r1 = rand() % 3;
+                    if(r1==0) {
+                        motor_turn(50,200,1000);
+                        vTaskDelay(0);
+                    }
+                    if(r1==1) {
+                        motor_turn(50,200,500);
+                        vTaskDelay(0);
+                    }
+                    if(r1==2) {
+                        motor_turn(200,50,500);
+                        vTaskDelay(0);
+                    }
                     }
                 }
                

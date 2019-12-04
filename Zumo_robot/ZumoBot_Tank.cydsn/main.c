@@ -977,21 +977,22 @@ void zmain(void)
                     // read raw sensor values
                     reflectance_read(&ref);
                     reflectance_digital(&dig); 
-                    if(dig.l3 != 1 && dig.r3 != 1){
-                        motor_turn(50,50,50);       // motor forward
-                        Beep(60,80);
-                    }
-                    else{
+                    
+                    if(dig.l3 == 0 && dig.r3 == 0 && dig.l1 == 0 && dig.r1 == 0 && dig.l2==0 && dig.r2==0){
                         motor_forward(0,0);       // Stop motors
                         startline = false;
+                    }
+                    else{
+                        motor_turn(50,50,50);       // motor forward
+                        Beep(60,80);
                     }
                 }
             print_mqtt("Zumo006/ready","line");
             IR_wait();  // wait for IR command
-            CySysTickEnable();
-            CySysTickStart();
-            int start = CySysTickGetValue();
-            print_mqtt("Zumo006/start","%d", start);
+            //CySysTickEnable();
+            //CySysTickStart();
+            //int start = CySysTickGetValue();
+            //print_mqtt("Zumo006/start","%d", start);
             led = !led;
             BatteryLed_Write(led);   
             
@@ -1008,7 +1009,7 @@ void zmain(void)
                     while(dig.l2 != 1 || dig.r2 != 1){
                         //motor_turn(50,50,0);
                         if(data.accX<-4000){
-                            print_mqtt("Zumo006/hit","%d", CySysTickGetValue());
+                            //print_mqtt("Zumo006/hit","%d", CySysTickGetValue());
                             int r = rand() % 2;      // Returns a pseudo-random integer between 0 and RAND_MAX.
                             int r1 = rand() % 500;
                             if(r == 0){
@@ -1040,10 +1041,10 @@ void zmain(void)
                 }
                
             }
-            int end = CySysTickGetValue();
-            print_mqtt("Zumo006/stop","%d", end);
-            CySysTickStop();
-            print_mqtt("Zumo006/time","%d", end - start);
+            //int end = CySysTickGetValue();
+            //print_mqtt("Zumo006/stop","%d", end);
+            //CySysTickStop();
+            //print_mqtt("Zumo006/time","%d", end - start);
         }
     }
  }

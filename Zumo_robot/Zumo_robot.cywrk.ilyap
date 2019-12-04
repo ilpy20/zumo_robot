@@ -13,7 +13,7 @@
 <v>Output</v>
 </TreeKeys>
 <TreeStates>
-<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="Zumo_robot\ZumoBot_Tank\Source Files\zumo_config.h">
+<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="Zumo_robot\ZumoBot_Tank\Source Files\paho.mqtt.embedded-c">
 <ExpandedNodeIds>
 <v>Zumo_robot</v>
 <v>Zumo_robot\ZumoBot_Tank</v>
@@ -121,9 +121,6 @@
 <v>Zumo_robot\ZumoBot_Tank\Generated_Source\PSoC5</v>
 </ExpandedNodeIds>
 <VisibleNodeIds>
-<v>Zumo_robot\ZumoBot_Tank\Source Files\Library\IR.c</v>
-<v>Zumo_robot\ZumoBot_Tank\Source Files\Library\LSM303D.c</v>
-<v>Zumo_robot\ZumoBot_Tank\Source Files\Library\Magnet.c</v>
 <v>Zumo_robot\ZumoBot_Tank\Source Files\Library\Motor.c</v>
 <v>Zumo_robot\ZumoBot_Tank\Source Files\Library\mqtt_sender.c</v>
 <v>Zumo_robot\ZumoBot_Tank\Source Files\Library\Nunchuk.c</v>
@@ -159,6 +156,9 @@
 <v>Zumo_robot\ZumoBot_Tank\Source Files\paho.mqtt.embedded-c\MQTTPacket\StackTrace.h</v>
 <v>Zumo_robot\ZumoBot_Tank\Source Files\main.c</v>
 <v>Zumo_robot\ZumoBot_Tank\Source Files\zumo_config.h</v>
+<v>Zumo_robot\ZumoBot_Tank\Generated_Source</v>
+<v>Zumo_robot\ZumoBot_Tank\Generated_Source\PSoC5</v>
+<v>Zumo_robot\ZumoBot_Tank\Generated_Source\PSoC5\ADC_Battery</v>
 </VisibleNodeIds>
 </CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237>
 <CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="">

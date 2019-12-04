@@ -989,10 +989,10 @@ void zmain(void)
                 }
             print_mqtt("Zumo006/ready","line");
             IR_wait();  // wait for IR command
-            //CySysTickEnable();
-            //CySysTickStart();
-            //int start = CySysTickGetValue();
-            //print_mqtt("Zumo006/start","%d", start);
+            CySysTickEnable();
+            CySysTickStart();
+            int start = CySysTickGetValue();
+            print_mqtt("Zumo006/start","%d", start);
             led = !led;
             BatteryLed_Write(led);   
             
@@ -1008,8 +1008,8 @@ void zmain(void)
                     LSM303D_Read_Acc(&data);
                     while(dig.l2 != 1 || dig.r2 != 1){
                         //motor_turn(50,50,0);
-                        if(data.accX<-4000){
-                            //print_mqtt("Zumo006/hit","%d", CySysTickGetValue());
+                        if(data.accX > 1500){
+                            print_mqtt("Zumo006/hit","%d", CySysTickGetValue());
                             int r = rand() % 2;      // Returns a pseudo-random integer between 0 and RAND_MAX.
                             int r1 = rand() % 500;
                             if(r == 0){
@@ -1041,10 +1041,10 @@ void zmain(void)
                 }
                
             }
-            //int end = CySysTickGetValue();
-            //print_mqtt("Zumo006/stop","%d", end);
-            //CySysTickStop();
-            //print_mqtt("Zumo006/time","%d", end - start);
+            int end = CySysTickGetValue();
+            print_mqtt("Zumo006/stop","%d", end);
+            CySysTickStop();
+            print_mqtt("Zumo006/time","%d", end - start);
         }
     }
  }

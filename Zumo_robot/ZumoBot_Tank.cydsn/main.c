@@ -896,13 +896,13 @@ void zmain(void)
         // send data when we detect a hit and at 10 second intervals
         if(data.accX > 1500 || ++ctr > 1000) {
             printf("Acc: %8d %8d %8d\n",data.accX, data.accY, data.accZ);
-            print_mqtt("Zumo01/acc", "%d,%d,%d", data.accX, data.accY, data.accZ);
+            //print_mqtt("Zumo01/acc", "%d,%d,%d", data.accX, data.accY, data.accZ);
             reflectance_read(&ref);
             printf("Ref: %8d %8d %8d %8d %8d %8d\n", ref.l3, ref.l2, ref.l1, ref.r1, ref.r2, ref.r3);       
-            print_mqtt("Zumo01/ref", "%d,%d,%d,%d,%d,%d", ref.l3, ref.l2, ref.l1, ref.r1, ref.r2, ref.r3);
+            //print_mqtt("Zumo01/ref", "%d,%d,%d,%d,%d,%d", ref.l3, ref.l2, ref.l1, ref.r1, ref.r2, ref.r3);
             reflectance_digital(&dig);
             printf("Dig: %8d %8d %8d %8d %8d %8d\n", dig.l3, dig.l2, dig.l1, dig.r1, dig.r2, dig.r3);
-            print_mqtt("Zumo01/dig", "%d,%d,%d,%d,%d,%d", dig.l3, dig.l2, dig.l1, dig.r1, dig.r2, dig.r3);
+            //print_mqtt("Zumo01/dig", "%d,%d,%d,%d,%d,%d", dig.l3, dig.l2, dig.l1, dig.r1, dig.r2, dig.r3);
             ctr = 0;
         }
         vTaskDelay(10);
@@ -964,7 +964,7 @@ void zmain(void)
             struct sensors_ ref;
             struct sensors_ dig;
             bool led = false,loop1 = true, startline= true, loop2 = true;
-            int count =0;
+            //int count =0;
             motor_start();              // enable motor controller
             print_mqtt("Zumo006/ready","line");
             IR_flush(); // clear IR receive buffer
@@ -1008,7 +1008,7 @@ void zmain(void)
                     LSM303D_Read_Acc(&data);
                     while(dig.l2 != 1 || dig.r2 != 1){
                         //motor_turn(50,50,0);
-                        if(data.accX > 1500){
+                        if(data.accX > -4000){
                             print_mqtt("Zumo006/hit","%d", CySysTickGetValue());
                             int r = rand() % 2;      // Returns a pseudo-random integer between 0 and RAND_MAX.
                             int r1 = rand() % 500;

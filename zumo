@@ -1,0 +1,153 @@
+#include <project.h>
+#include <stdio.h>
+#include "FreeRTOS.h"
+#include "task.h"
+#include "Motor.h"
+#include "Ultra.h"
+#include "Nunchuk.h"
+#include "Reflectance.h"
+#include "Gyro.h"
+#include "Accel_magnet.h"
+#include "LSM303D.h"
+#include "IR.h"
+#include "Beep.h"
+#include "mqtt_sender.h"
+#include <time.h>
+#include <sys/time.h>
+#include "serial1.h"
+#include <unistd.h>
+#include <stdlib.h>
+
+
+// Calibrated 
+void go_forward(uint8 speed, int delay)
+{
+    MotorDirLeft_Write(0);      
+    MotorDirRight_Write(0);    
+    PWM_WriteCompare1(speed); 
+    PWM_WriteCompare2(speed-7); 
+    vTaskDelay(delay);
+}
+
+// turn to left
+void tankturn_left(uint8 speed_left, uint8 speed_right, int delay)
+{
+    MotorDirLeft_Write(1);      
+    MotorDirRight_Write(0);    
+    PWM_WriteCompare1(speed_left); 
+    PWM_WriteCompare2(speed_right); 
+    vTaskDelay(delay);
+}
+
+// turn to right
+void tankturn_right(uint8 speed_left, uint8 speed_right, int delay)
+{
+    MotorDirLeft_Write(0);      
+    MotorDirRight_Write(1);    
+    PWM_WriteCompare1(speed_left); 
+    PWM_WriteCompare2(speed_right); 
+    vTaskDelay(delay);
+}
+
+void go_forward(uint8 speed, int delay);    
+void tankturn_right(uint8 speed_left, uint8 speed_right, int delay);    
+void tankturn_left(uint8 speed_left, uint8 speed_right, int delay);
+
+void zmain(void)
+{
+    
+    struct accData_ data; 
+    LSM303D_Start();
+    Ultra_Start();
+    
+    struct sensors_ dig;
+    TickType_t start, end, hit = 0;
+    
+    reflectance_start();
+    reflectance_set_threshold(9000, 9000, 9000, 9000, 11000, 13000);
+    
+    motor_start();
+    motor_forward(0,0);
+    IR_Start();
+    
+    // Prepare for the fight, wait for IR on the line
+    while (SW1_Read() == 1) {
+        vTaskDelay(100);
+    }
+    
+    // Search for the circle
+    while (dig.l1 != 1 || dig.l2 != 1 || dig.l3 != 1 ||
+          dig.r1 != 1 || dig.r2 != 1 || dig.r3 != 1) {
+            reflectance_digital(&dig);
+            go_forward(55, 10);
+    }
+    
+    motor_forward(0, 0); 
+    print_mqtt("Zumo006/ready", "zumo");
+    IR_wait();
+    
+    // Pass the circle line
+    go_forward(100, 200);
+            
+    start = xTaskGetTickCount();
+    print_mqtt("Zumo006/start", "%d", start);
+    
+    // Sumo fighting loop
+    while (true) {
+        go_forward(100, 5);
+        LSM303D_Read_Acc(&data);
+        reflectance_digital(&dig);
+        
+        // Detect hits from the back, left and right sides
+        if (data.accX > 12000 || data.accY > 12000 || data.accX < -12000 || data.accY < -12000) {
+            
+            // Send the hit message with the minimal time interval
+            // of 100 seconds
+            if (xTaskGetTickCount() - hit > 110) {
+                hit = xTaskGetTickCount();
+                print_mqtt("Zumo006/attack", "%d", hit);
+                
+                // Change the direction 90 degree and sprint to avoid unnecessary collisions
+                tankturn_left(255, 255, 300);
+                motor_forward(0,0);
+                go_forward(255, 100); 
+                go_forward(100, 100); 
+            }
+        }
+        
+        
+        if (Ultra_GetDistance() < 10) {
+            go_forward(255, 300);
+            go_forward(100, 100);
+            
+            if (xTaskGetTickCount() - hit > 100) {
+                hit = xTaskGetTickCount();
+                print_mqtt("Zumo006/hit", "%d", hit);
+            }
+        }
+        
+        // 180 turn
+        if (dig.l1 == 1 || dig.l2 == 1 || dig.l3 == 1||
+        dig.r1 == 1 || dig.r2 == 1 || dig.r3 == 1) {
+            motor_backward(100, 200);
+            motor_forward(0, 0);
+            tankturn_right(200, 200, 400);   
+            motor_forward(0, 0);
+            go_forward(100, 100); 
+        }
+        
+        // Stop the fight by pressing the user button
+        if (SW1_Read() == 0) {
+            motor_forward(0,0);
+            
+            end = xTaskGetTickCount();
+            print_mqtt("Zumo006/stop", "%d", end);
+            int delta = end - start;
+            print_mqtt("Zuome006/time", "%d", delta);
+            
+            motor_stop();
+            while(true)
+                vTaskDelay(100);
+        }
+    }
+}

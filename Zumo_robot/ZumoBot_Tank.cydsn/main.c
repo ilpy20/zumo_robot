@@ -947,106 +947,147 @@ void zmain(void)
  }   
 #endif
 
+#if 0
+//main project 1    
+#endif
+
 #if 1
-//main project
+//main project 2
+// Calibrated 
+void go_forward(uint8 speed, int delay)
+{
+    MotorDirLeft_Write(0);      
+    MotorDirRight_Write(0);    
+    PWM_WriteCompare1(speed); 
+    PWM_WriteCompare2(speed-7); 
+    vTaskDelay(delay);
+}
+
+// turn to left
+void tankturn_left(uint8 speed_left, uint8 speed_right, int delay)
+{
+    MotorDirLeft_Write(1);      
+    MotorDirRight_Write(0);    
+    PWM_WriteCompare1(speed_left); 
+    PWM_WriteCompare2(speed_right); 
+    vTaskDelay(delay);
+}
+
+// turn to right
+void tankturn_right(uint8 speed_left, uint8 speed_right, int delay)
+{
+    MotorDirLeft_Write(0);      
+    MotorDirRight_Write(1);    
+    PWM_WriteCompare1(speed_left); 
+    PWM_WriteCompare2(speed_right); 
+    vTaskDelay(delay);
+}
+
+void go_forward(uint8 speed, int delay);    
+void tankturn_right(uint8 speed_left, uint8 speed_right, int delay);    
+void tankturn_left(uint8 speed_left, uint8 speed_right, int delay);
+
 void zmain(void)
 {
-    struct accData_ data;
-    
-    uint8_t button_;
-    printf("\nStart\n");
-    
-    while(true){
-        button_ = SW1_Read();
-        if(button_==0){
-            IR_Start();
-            printf("\n\nIR test\n");
-            struct sensors_ ref;
-            struct sensors_ dig;
-            bool led = false,loop1 = true, startline= true, loop2 = true;
-            //int count =0;
-            motor_start();              // enable motor controller
-            print_mqtt("Zumo006/ready","line");
-            IR_flush(); // clear IR receive buffer
-            printf("Buffer cleared\n");
-            
-            reflectance_start();
-            reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000); // set center sensor threshold to 11000 and others to 9000
-            vTaskDelay(200);
-                while(startline){
-                    // read raw sensor values
-                    reflectance_read(&ref);
-                    reflectance_digital(&dig); 
-                    
-                    if(dig.l3 == 0 && dig.r3 == 0 && dig.l1 == 0 && dig.r1 == 0 && dig.l2==0 && dig.r2==0){
-                        motor_forward(0,0);       // Stop motors
-                        startline = false;
-                    }
-                    else{
-                        motor_turn(50,50,50);       // motor forward
-                        Beep(60,80);
-                    }
-                }
-            print_mqtt("Zumo006/ready","line");
-            IR_wait();  // wait for IR command
-            CySysTickEnable();
-            CySysTickStart();
-            int start = CySysTickGetValue();
-            print_mqtt("Zumo006/start","%d", start);
-            led = !led;
-            BatteryLed_Write(led);   
-            
-            // Toggle led when IR signal is received
-            while(loop1)
-            {   
-                if(led){
-                    while(loop2){
-                    // read raw sensor values
-                    reflectance_read(&ref);
-                    reflectance_digital(&dig); 
 
-                    LSM303D_Read_Acc(&data);
-                    while(dig.l2 != 1 || dig.r2 != 1){
-                        //motor_turn(50,50,0);
-                        if(data.accX > -4000){
-                            print_mqtt("Zumo006/hit","%d", CySysTickGetValue());
-                            int r = rand() % 2;      // Returns a pseudo-random integer between 0 and RAND_MAX.
-                            int r1 = rand() % 500;
-                            if(r == 0){
-                                //motor_backward(80,50);
-                                motor_turn(200,50,r1);
-                                vTaskDelay(0);
-                            }
-                            else{
-                                motor_turn(50,200,r1);
-                                vTaskDelay(0);
-                            }
-                        }
-                        else{
-                            motor_turn(50,50,0);
-                        }
-                        
-                    }
-                    int r2 = rand() % 1000;
-                    int r = rand() % 2;      // Returns a pseudo-random integer between 0 and RAND_MAX.
-                    if(r==0) {
-                        motor_turn(50,200,r2);
-                        vTaskDelay(0);
-                    }
-                    else {
-                        motor_turn(50,200,r2);
-                        vTaskDelay(0);
-                    }
-                    }
-                }
-               
+    struct accData_ data; 
+    LSM303D_Start();
+    Ultra_Start();
+
+    struct sensors_ dig;
+    TickType_t start, end, hit = 0;
+
+    reflectance_start();
+    reflectance_set_threshold(9000, 9000, 9000, 9000, 11000, 13000);
+
+    motor_start();
+    motor_forward(0,0);
+    IR_Start();
+
+    // Prepare for the fight, wait for IR on the line
+    while (SW1_Read() == 1) {
+        vTaskDelay(100);
+    }
+
+    // Search for the circle
+    while (dig.l1 != 1 || dig.l2 != 1 || dig.l3 != 1 ||
+          dig.r1 != 1 || dig.r2 != 1 || dig.r3 != 1) {
+            reflectance_digital(&dig);
+            go_forward(55, 10);
+    }
+
+    motor_forward(0, 0); 
+    print_mqtt("Zumo006/ready", "zumo");
+    IR_wait();
+
+    // Pass the circle line
+    go_forward(100, 200);
+
+    start = xTaskGetTickCount();
+    print_mqtt("Zumo006/start", "%d", start);
+
+    // Sumo fighting loop
+    while (true) {
+        go_forward(100, 5);
+        LSM303D_Read_Acc(&data);
+        reflectance_digital(&dig);
+
+        // Detect hits from the back, left and right sides
+        if (data.accX > 12000 || data.accY > 12000 || data.accX < -12000 || data.accY < -12000) {
+
+            // Send the hit message with the minimal time interval
+            // of 100 seconds
+            if (xTaskGetTickCount() - hit > 110) {
+                hit = xTaskGetTickCount();
+                print_mqtt("Zumo006/attack", "%d", hit);
+
+                // Change the direction 90 degree and sprint to avoid unnecessary collisions
+                tankturn_left(255, 255, 300);
+                motor_forward(0,0);
+                go_forward(255, 100); 
+                go_forward(100, 100); 
             }
-            int end = CySysTickGetValue();
-            print_mqtt("Zumo006/stop","%d", end);
-            CySysTickStop();
-            print_mqtt("Zumo006/time","%d", end - start);
+        }
+
+
+        if (Ultra_GetDistance() < 10) {
+            go_forward(255, 300);
+            go_forward(100, 100);
+
+            if (xTaskGetTickCount() - hit > 100) {
+                hit = xTaskGetTickCount();
+                print_mqtt("Zumo006/hit", "%d", hit);
+            }
+        }
+
+        // 180 turn
+        if (dig.l1 == 1 || dig.l2 == 1 || dig.l3 == 1||
+        dig.r1 == 1 || dig.r2 == 1 || dig.r3 == 1) {
+            motor_backward(100, 200);
+            motor_forward(0, 0);
+            tankturn_right(200, 200, 400);   
+            motor_forward(0, 0);
+            go_forward(100, 100); 
+        }
+
+        // Stop the fight by pressing the user button
+        if (SW1_Read() == 0) {
+            motor_forward(0,0);
+
+            end = xTaskGetTickCount();
+            print_mqtt("Zumo006/stop", "%d", end);
+            int delta = end - start;
+            print_mqtt("Zuome006/time", "%d", delta);
+
+            motor_stop();
+            while(true)
+                vTaskDelay(100);
         }
     }
- }
+}
+#endif
+
+#if 0
+//main project 3    
 #endif
 /* [] END OF FILE */

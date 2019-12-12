@@ -1,0 +1,118 @@
+#if 1
+//Line following competition by Andrey Verovskiy
+//IR receiverm - how to wait for IR remote commands
+void zmain(void)
+{
+    //IR receiverm - how to wait for IR remote commands
+void zmain(void);
+
+    uint8_t button_;
+    printf("\nStart\n");
+    
+    while(true){
+        button_ = SW1_Read();
+        if(button_==0){
+            IR_Start();
+            printf("\n\nIR test\n");
+            struct sensors_ ref;
+            struct sensors_ dig;
+            bool led = false,loop = true, startline= true;
+            int count =0;
+            motor_start();// enable motor controller 
+            IR_flush(); // clear IR receive buffer
+            printf("Buffer cleared\n");
+            
+            reflectance_start();
+            // set center sensor threshold to 11000 and others to 9000
+            reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000); 
+            vTaskDelay(200);
+                while(startline){
+                    // read raw sensor values
+                    reflectance_read(&ref);
+                    reflectance_digital(&dig); 
+                    if(dig.l3 != 1 && dig.r3 != 1){
+                        motor_turn(50,50,50);       //goes forward
+                        Beep(60,80);
+                    }
+                    
+                    else{
+                        motor_forward(0,0);       // Stop motors
+                        printf("line");
+                        print_mqtt("Zumo006/ready", "line");
+                        startline = false;
+                    }
+                }
+            IR_wait();  // wait for IR command
+            led = !led;
+            BatteryLed_Write(led);   
+            int start;
+            start = xTaskGetTickCount();
+            print_mqtt("Zumo006/start", "%d", start);
+            
+            // main loop when IR signal is recieved
+            while(loop)
+            {   
+                if(led){
+                    // read raw sensor values
+                    reflectance_read(&ref);
+                    reflectance_digital(&dig); 
+                    
+                    if(dig.l3 == 1 && dig.r3 == 1 && dig.l2 == 1 && dig.r2 == 1){
+                         motor_turn(50,50,50); //goes forward
+	                        vTaskDelay(50);
+                        count++;    //counts the lines that sensors detect
+                        
+                        printf("count %d \n",count);
+                        if(count >= 7){//stops on the third line
+                            motor_forward(0,0);// Stop motors
+                            int stop;
+                            stop=xTaskGetTickCount();
+                            //prints stop time
+                            print_mqtt("Zumo006/stop", "%d",stop ); 
+                            //addition of time variable
+                            int time= stop - start;  
+                            //prints overall time 
+                            print_mqtt("Zumo006/time", "%d",time);    
+                            vTaskDelay(1000000);
+                            break;
+                        }
+                    }
+                    //goes forward if sensors l1 and r1 detect the line
+                    else if (dig.l1 == 1 && dig.r1 == 1){
+                        motor_turn(100,100,0);
+                        printf("%5d %5d", ref.l1, ref.r1);
+                    }
+                    //turns right if left sensor does not detect the line
+                    else if (dig.l1 == 0 && dig.r1 == 1){
+                        motor_turn(100,0,0);  
+                        printf("%5d %5d", ref.l1, ref.r1);
+                    }
+                    //turns left if right sensor does not detect the line
+                    else if (dig.l1 == 1 && dig.r1 == 0){
+                        motor_turn(0,100,0);      
+                        printf("%5d %5d", ref.l1, ref.r1);
+                    }
+                    /*else if (dig.l1==0 && dig.r1==0){
+                     motor_turn(0,200,0);
+                     printf("%5d %5d", ref.l1, ref.r1);
+                     int miss; 
+                     miss=xTaskGetTickCount();
+                     print_mqtt("Zumo006/miss", "%d",miss);
+                         if(dig.l1==1&&dig.r1==1){
+                              motor_turn(100,100,0);
+                        printf("%5d %5d", ref.l1, ref.r1);
+                        int line;
+                        line=xTaskGetTickCount();
+                        print_mqtt("Zumo006/line", "%d",line);
+                    }
+                    }*/
+                    }
+                }
+                
+               
+            }    
+        }
+
+}  
+
+#endif

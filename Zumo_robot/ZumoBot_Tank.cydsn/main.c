@@ -949,7 +949,7 @@ void zmain(void)
 
 #if 0
 //main project 1
-//Line following competition
+//Line following competition by Andrey Verovskiy
 //IR receiverm - how to wait for IR remote commands
 void zmain(void)
 {
@@ -968,19 +968,20 @@ void zmain(void);
             struct sensors_ dig;
             bool led = false,loop = true, startline= true;
             int count =0;
-            motor_start();              // enable motor controller 
+            motor_start();// enable motor controller 
             IR_flush(); // clear IR receive buffer
             printf("Buffer cleared\n");
             
             reflectance_start();
-            reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000); // set center sensor threshold to 11000 and others to 9000
+            // set center sensor threshold to 11000 and others to 9000
+            reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000); 
             vTaskDelay(200);
                 while(startline){
                     // read raw sensor values
                     reflectance_read(&ref);
                     reflectance_digital(&dig); 
                     if(dig.l3 != 1 && dig.r3 != 1){
-                        motor_turn(50,50,50);       // motor forward
+                        motor_turn(50,50,50);       //goes forward
                         Beep(60,80);
                     }
                     
@@ -998,7 +999,7 @@ void zmain(void);
             start = xTaskGetTickCount();
             print_mqtt("Zumo006/start", "%d", start);
             
-            // Toggle led when IR signal is received
+            // main loop when IR signal is recieved
             while(loop)
             {   
                 if(led){
@@ -1006,40 +1007,42 @@ void zmain(void);
                     reflectance_read(&ref);
                     reflectance_digital(&dig); 
                     
-                    if(dig.l3 == 1 && dig.r3 == 1){
-                         motor_turn(50,50,50);       // motor forward
+                    if(dig.l3 == 1 && dig.r3 == 1 && dig.l2 == 1 && dig.r2 == 1){
+                         motor_turn(50,50,50); //goes forward
 	                        vTaskDelay(50);
-                        count++;
+                        count++;    //counts the lines that sensors detect
                         
                         printf("count %d \n",count);
-                        if(count >= 5){
-                            motor_forward(0,0);       // Stop motors
+                        if(count >= 7){//stops on the third line
+                            motor_forward(0,0);// Stop motors
                             int stop;
-                            print_mqtt("Zumo006/stop", "%d" /*,set time here*/);
-                            int time= stop -start;
-                            print_mqtt("Zumo006/time", "%d" /*,stop-start*/);
+                            stop=xTaskGetTickCount();
+                            //prints stop time
+                            print_mqtt("Zumo006/stop", "%d",stop ); 
+                            //addition of time variable
+                            int time= stop - start;  
+                            //prints overall time 
+                            print_mqtt("Zumo006/time", "%d",time);    
                             vTaskDelay(1000000);
                             break;
                         }
                     }
-                    
+                    //goes forward if sensors l1 and r1 detect the line
                     else if (dig.l1 == 1 && dig.r1 == 1){
-                        motor_turn(100,100,0);   //goes forward lul
+                        motor_turn(100,100,0);
                         printf("%5d %5d", ref.l1, ref.r1);
                     }
+                    //turns right if left sensor does not detect the line
                     else if (dig.l1 == 0 && dig.r1 == 1){
-                        motor_turn(100,0,0);  //turns right lul
+                        motor_turn(100,0,0);  
                         printf("%5d %5d", ref.l1, ref.r1);
                     }
+                    //turns left if right sensor does not detect the line
                     else if (dig.l1 == 1 && dig.r1 == 0){
-                        motor_turn(0,100,0);   ///should turn left, right lul??   
+                        motor_turn(0,100,0);      
                         printf("%5d %5d", ref.l1, ref.r1);
                     }
-                    else if (dig.l3 == 1 && dig.r3 == 1 && dig.l1 == 1 && dig.r1 == 1 && dig.l2 == 1 && dig.r2 == 1) {
-                        motor_turn(0,0,100000);   ///should stop, right lul??   
-                        
-                   
-                        }
+                    
                     }
                 }
                 
@@ -1047,7 +1050,7 @@ void zmain(void);
             }    
         }
 
-} 
+}  
 #endif
 
 #if 1
@@ -1062,7 +1065,7 @@ void go_forward(uint8 speed, int delay)
     vTaskDelay(delay);
 }
 
-// turn to left 180% (main functions for left)
+// turn to left  (main functions for left)
 void tankturn_left(uint8 speed_left, uint8 speed_right, int delay)
 {
     MotorDirLeft_Write(1);      
@@ -1072,7 +1075,7 @@ void tankturn_left(uint8 speed_left, uint8 speed_right, int delay)
     vTaskDelay(delay);
 }
 
-// turn to right 180% (main functions for right)
+// turn to right  (main functions for right)
 void tankturn_right(uint8 speed_left, uint8 speed_right, int delay)
 {
     MotorDirLeft_Write(0);      
@@ -1103,25 +1106,25 @@ void zmain(void)
     motor_forward(0,0);
     IR_Start();
     
-    // Prepare for the fight, wait for IR on the line. Press Ok
+  // Prepare for the fight, wait for IR on the line. Press Ok
     while (SW1_Read() == 1) {
         vTaskDelay(150);
     }
     
-    // Search circle 
+ // Search circle 
     while (dig.l1 != 1 || dig.l2 != 1 || dig.l3 != 1 ||
           dig.r1 != 1 || dig.r2 != 1 || dig.r3 != 1) {
             reflectance_digital(&dig);
             go_forward(70, 20);
     }
-    
+ //wait near circle
     motor_forward(0, 0); 
     print_mqtt("Zumo006/ready", "zumo");
     IR_wait();
     
-    // Pass the circle line
+ // Pass the circle line
     go_forward(100, 200);
-            
+ //start for screen
     start = xTaskGetTickCount();
     print_mqtt("Zumo006/start", "%d", start);
     
@@ -1131,16 +1134,16 @@ void zmain(void)
         LSM303D_Read_Acc(&data);
         reflectance_digital(&dig);
         
-        // Detect hits from sides
+        // Detect hits from diffrent sides
         if (data.accX > 12000 || data.accY > 12000 || data.accX < -12000 || data.accY < -12000) {
             
-            // Send the attack message 
+        // Send the hit message 
             // of 110 seconds
             if (xTaskGetTickCount() - hit > 110) {
                 hit = xTaskGetTickCount();
                 print_mqtt("Zumo006/attack", "%d", hit);
                 
-                // Change the direction 180 degree and sprint to avoid unnecessary collisions
+         // Change the direction  and sprint 
                 tankturn_left(250, 250, 00);
                 motor_forward(0,0);
                 go_forward(255, 100); 
@@ -1148,18 +1151,18 @@ void zmain(void)
             }
         }
         
-        
+     // attack
         if (Ultra_GetDistance() < 17) {
             go_forward(255, 350);
             go_forward(255, 150);
-            
+      // screen   
             if (xTaskGetTickCount() - hit > 150) {
                 hit = xTaskGetTickCount();
                 print_mqtt("Zumo006/hit", "%d", hit);
             }
         }
         
-        // 180 turn
+     // end of circle and turn 
         if (dig.l1 == 1 || dig.l2 == 1 || dig.l3 == 1||
         dig.r1 == 1 || dig.r2 == 1 || dig.r3 == 1) {
             motor_backward(220, 200);
@@ -1169,15 +1172,15 @@ void zmain(void)
             go_forward(200, 150); 
         }
         
-        // Stop the fight by pressing the user button
+     // Stop the fight by pressing the user button
         if (SW1_Read() == 0) {
             motor_forward(0,0);
-            
+     //end for screen 
             end = xTaskGetTickCount();
             print_mqtt("Zumo006/stop", "%d", end);
             int delta = end - start;
             print_mqtt("Zuome006/time", "%d", delta);
-            
+      //stop 
             motor_stop();
             while(true)
                 vTaskDelay(100);

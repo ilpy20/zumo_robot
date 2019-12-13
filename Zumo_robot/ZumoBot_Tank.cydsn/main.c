@@ -67,7 +67,7 @@ void zmain(void){
 #endif
 
 #if 0
-// Beep light test
+// Task 2.1 Beep light test
 void zmain(void)
 {
     while(true)
@@ -102,7 +102,7 @@ void zmain(void)
 #endif
 
 #if 0
-// Name and age
+// Task 2.2 Name and age
 void zmain(void)
 {
     TickType_t start;
@@ -166,7 +166,7 @@ void zmain(void)
 
 
 #if 0
-//battery level//
+//Task 2.3 battery level//
 void zmain(void)
 {
 	ADC_Battery_Start();   	 
@@ -273,14 +273,14 @@ void zmain(void)
     
 void zmain(void)
 {
-    Ultra_Start();
+    Ultra_Start(); //start ultrasonic sensor
     motor_start(0,0);
     motor_forward(0,0);
     
     vTaskDelay(3000);
     
     while(true){
-    int distance = Ultra_GetDistance();
+    int distance = Ultra_GetDistance(); //get distace between object and ultrasonic sensor
     
     if(distance <= 10 && distance !=0){
         motor_backward(50,500);
@@ -309,7 +309,7 @@ void zmain(void)
 #endif
 
 #if 0
-//IR receiverm - how to wait for IR remote commands
+//Task 4.1 IR receiverm - how to wait for IR remote commands
 void zmain(void)
 {
     uint8_t button_;
@@ -384,7 +384,7 @@ void zmain(void)
 
 
 #if 0
-//IR receiverm - how to wait for IR remote commands
+//Task 4.2 IR receiverm - how to wait for IR remote commands
 void zmain(void)
 {
     uint8_t button_;
@@ -490,7 +490,7 @@ void zmain(void)
 #endif
 
 #if 0
-//IR receiverm - how to wait for IR remote commands
+//Task 4.3 IR receiverm - how to wait for IR remote commands
 void zmain(void)
 {
     //IR receiverm - how to wait for IR remote commands
@@ -651,7 +651,7 @@ void zmain(void)
 #endif
 
 #if 0
-/* Example of how to use te Accelerometer!!!*/
+/* Task 3.3*/
 void zmain(void)
 {
     struct accData_ data;
@@ -743,10 +743,10 @@ void zmain(void)
 
 #if 0
 
-    
+//Task 5.2   
 void zmain(void)
 {
-    Ultra_Start();
+    Ultra_Start(); //start ultasonic sensor
     motor_start(0,0);
     motor_forward(0,0);
     
@@ -777,7 +777,7 @@ void zmain(void)
 #endif
 
 #if 0
-//IR receiverm - how to wait for IR remote commands
+//Task 5.3 IR receiverm - how to wait for IR remote commands
 void zmain(void)
 {
     RTC_Start(); // start real time clock
@@ -792,7 +792,7 @@ void zmain(void)
     // set current time
     now.Hour = timeinfo->tm_hour;
     now.Min = timeinfo->tm_min;
-    now.Sec = timeinfo->tm_sec6;
+    now.Sec = timeinfo->tm_sec;
     now.DayOfMonth = timeinfo->tm_mday;
     now.Month = timeinfo->tm_mon+1;
     now.Year = timeinfo->tm_year+1900;
@@ -912,6 +912,7 @@ void zmain(void)
 #endif
 
 #if 0
+//Task 5.1
 void zmain(void)
 {    
     RTC_Start(); // start real time clock
@@ -948,7 +949,7 @@ void zmain(void)
 #endif
 
 #if 0
-//main project 1
+//project 1
 //Line following competition by Andrey Verovskiy
 //IR receiverm - how to wait for IR remote commands
 void zmain(void)
@@ -1054,7 +1055,7 @@ void zmain(void);
 #endif
 
 #if 1
-//main project 2
+//project 2
 // Calibrated robot (one of main functions)
 void go_forward(uint8 speed, int delay)
 {
